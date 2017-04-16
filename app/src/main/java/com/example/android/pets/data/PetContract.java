@@ -7,6 +7,9 @@ import android.provider.BaseColumns;
  * pack@oz-heng.com
  */
 
+/**
+ * API Contract for the Pets app.
+ */
 public final class PetContract {
 
     /**
@@ -18,7 +21,7 @@ public final class PetContract {
 
         public static final String TABLE_NAME = "pets";
 
-        private static final String _ID = BaseColumns._ID;
+        public static final String _ID = BaseColumns._ID;
         public static final String COLUMN_PET_NAME = "name";
         public static final String COLUMN_PET_BREED = "breed";
         public static final String COLUMN_PET_GENDER = "gender";
