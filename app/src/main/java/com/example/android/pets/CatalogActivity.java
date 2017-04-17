@@ -49,7 +49,8 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
+        //displayDatabaseInfo();
+        PetDbHelper mDbHelper = new PetDbHelper(this);
     }
 
     /**
