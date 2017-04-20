@@ -27,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
@@ -58,6 +59,11 @@ public class CatalogActivity extends AppCompatActivity {
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
         mDbHelper = new PetDbHelper(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         displayDatabaseInfo();
     }
@@ -78,7 +84,7 @@ public class CatalogActivity extends AppCompatActivity {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
             TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + cursor.getCount());
+            displayView.setText(getString(R.string.number_of_pets) + cursor.getCount());
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
@@ -90,7 +96,7 @@ public class CatalogActivity extends AppCompatActivity {
      * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
      */
     private void insertPet() {
-        mDbHelper = new PetDbHelper(this);
+//        mDbHelper = new PetDbHelper(this);
 
         // Gets the database in write mode
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -105,7 +111,11 @@ public class CatalogActivity extends AppCompatActivity {
         // Insert the new row, returning the primary key value of the new row
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
 
-        Log.v(LOG_TAG, "New row ID " + newRowId);
+        if (newRowId != -1) {
+            Toast.makeText(this, getString(R.string.msg_pet_saved_with_id) + newRowId, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, getString(R.string.msg_error_with_saving_pet), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

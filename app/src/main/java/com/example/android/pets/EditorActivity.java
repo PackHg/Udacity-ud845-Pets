@@ -15,6 +15,8 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -26,8 +28,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
+import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -45,6 +49,9 @@ public class EditorActivity extends AppCompatActivity {
 
     /** EditText field to enter the pet's gender */
     private Spinner mGenderSpinner;
+
+    /** Database helper that will provide access to the database */
+    private PetDbHelper mPetDbHelper;
 
     /**
      * Gender of the pet. The possible values are:
@@ -64,6 +71,31 @@ public class EditorActivity extends AppCompatActivity {
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
+    }
+
+    /**
+     * Insert the pet data entered from the editor.
+     */
+    private void insertPet() {
+
+        // Create the database helper and get a write access
+        mPetDbHelper = new PetDbHelper(this);
+        SQLiteDatabase db = mPetDbHelper.getWritableDatabase();
+
+        // Get the user inputs and insert these to the database
+        ContentValues values = new ContentValues();
+        values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.getText().toString().trim());
+        values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.getText().toString().trim());
+        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        values.put(PetEntry.COLUMN_PET_WEIGHT,
+                Integer.parseInt(mWeightEditText.getText().toString().trim()));
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+
+        if (newRowId != -1) {
+            Toast.makeText(this, getString(R.string.msg_pet_saved_with_id) + newRowId, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, getString(R.string.msg_error_with_saving_pet), Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -119,7 +151,8 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Do nothing for now
+                insertPet();
+                finish(); // Exit the activity
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

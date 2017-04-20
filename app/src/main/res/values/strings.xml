@@ -58,4 +58,12 @@
 
     <!-- Label for dropdown menu option if the pet is female [CHAR LIMIT=20] -->
     <string name="gender_female">Female</string>
+
+    <string name="number_of_pets">Number of rows in pets database table:&#160; </string>
+
+    <!-- Message displaying showing the if of the pet inserted in the database [CHAR LIMIT=30] -->
+    <string name="msg_pet_saved_with_id">Pet saved with Id:&#160; </string>
+
+    <!-- Message displaying showing error with inserting the pet inserted in the database [CHAR LIMIT=30] -->
+    <string name="msg_error_with_saving_pet">Error with saving pet</string>
 </resources>
