@@ -75,6 +75,7 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
+        // Select the columns of the database query.
         String[] projection = {
                 PetEntry._ID,
                 PetEntry.COLUMN_PET_NAME,
@@ -83,20 +84,50 @@ public class CatalogActivity extends AppCompatActivity {
                 PetEntry.COLUMN_PET_WEIGHT
         };
 
+        // Perform a query on the pets table.
         Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null);
+                PetEntry.TABLE_NAME,    // The table to query
+                projection,             // The columns to return
+                null,                   // The columns for the WHERE clause
+                null,                   // The values for the WHERE clause
+                null,                   // Don't group the rows
+                null,                   // Don't filter by row groups
+                null                    // The sort order
+        );
+
+        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
 
         try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText(getString(R.string.number_of_pets) + cursor.getCount());
+            // Create a header in the Text View that looks like this:
+            //
+            // The pets table contains <number of rows in Cursor> pets.
+            // _id - name - breed - gender - weight
+            //
+            // In the while loop below, iterate through the rows of the cursor and display
+            // the information from each column in this order.
+            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n");
+            displayView.append("\n" + PetEntry._ID
+                    + " - " + PetEntry.COLUMN_PET_NAME
+                    + " - " + PetEntry.COLUMN_PET_BREED
+                    + " - " + PetEntry.COLUMN_PET_GENDER
+                    + " - " + PetEntry.COLUMN_PET_WEIGHT + "\n");
+
+            // Figure out the index of each column
+            int nameCI = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+            int idCI = cursor.getColumnIndex(PetEntry._ID);
+            int breedCI = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+            int genderCI = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+            int wightCI = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+
+            // Iterate through all the returned rows in the cursor
+            while (cursor.moveToNext()) {
+                displayView.append( "\n" + cursor.getInt(idCI)
+                        + " - " + cursor.getString(nameCI)
+                        + " - " + cursor.getString(breedCI)
+                        + " - " + cursor.getInt(genderCI)
+                        + " - " + cursor.getInt(wightCI)
+                );
+             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
@@ -108,8 +139,6 @@ public class CatalogActivity extends AppCompatActivity {
      * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
      */
     private void insertPet() {
-//        mDbHelper = new PetDbHelper(this);
-
         // Gets the database in write mode
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
