@@ -15,8 +15,9 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -78,10 +79,6 @@ public class EditorActivity extends AppCompatActivity {
      */
     private void insertPet() {
 
-        // Create the database helper and get a write access
-        mPetDbHelper = new PetDbHelper(this);
-        SQLiteDatabase db = mPetDbHelper.getWritableDatabase();
-
         // Get the user inputs and insert these to the database
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.getText().toString().trim());
@@ -89,12 +86,18 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT,
                 Integer.parseInt(mWeightEditText.getText().toString().trim()));
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
 
-        if (newRowId != -1) {
-            Toast.makeText(this, getString(R.string.msg_pet_saved_with_id) + newRowId, Toast.LENGTH_LONG).show();
+        Uri uri = getContentResolver().insert(
+                PetEntry.CONTENT_URI,   // The pets content URI
+                values                  // The values to insert
+        );
+
+        long id = ContentUris.parseId(uri);
+
+        if (uri != null) {
+            Toast.makeText(this, getString(R.string.editor_insert_pet_successful) + id, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this, getString(R.string.msg_error_with_saving_pet), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed), Toast.LENGTH_LONG).show();
         }
     }
 

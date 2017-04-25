@@ -15,10 +15,11 @@
  */
 package com.example.android.pets;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -29,16 +30,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
     private static final String LOG_TAG = CatalogActivity.class.getSimpleName();
-
-    /** Database helper that will provide us access to the database */
-    PetDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +51,6 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
     }
 
     @Override
@@ -136,23 +129,25 @@ public class CatalogActivity extends AppCompatActivity {
      * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
      */
     private void insertPet() {
-        // Gets the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        // Create a new and dummy map of values, where column names are the keys
+         // Create a new and dummy map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, "Toto");
         values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
         values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
-        // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+        Uri uri = getContentResolver().insert(
+                PetEntry.CONTENT_URI,   // The pets content URI
+                values                  // The values to insert
+        );
 
-        if (newRowId != -1) {
-            Toast.makeText(this, getString(R.string.msg_pet_saved_with_id) + newRowId, Toast.LENGTH_LONG).show();
+        long id = ContentUris.parseId(uri);
+
+        if (uri != null) {
+            Toast.makeText(this, getString(R.string.editor_insert_pet_successful) + id, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this, getString(R.string.msg_error_with_saving_pet), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed), Toast.LENGTH_LONG).show();
         }
     }
 
