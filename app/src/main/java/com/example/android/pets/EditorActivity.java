@@ -84,8 +84,15 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.getText().toString().trim());
         values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.getText().toString().trim());
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
-        values.put(PetEntry.COLUMN_PET_WEIGHT,
-                Integer.parseInt(mWeightEditText.getText().toString().trim()));
+
+        // Set weight to 0 by default if the user enters an empty String ""
+        int weight;
+        try {
+           weight = Integer.parseInt(mWeightEditText.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            weight = 0;
+        }
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
         Uri uri = getContentResolver().insert(
                 PetEntry.CONTENT_URI,   // The pets content URI
